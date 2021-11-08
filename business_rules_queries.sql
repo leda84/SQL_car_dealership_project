@@ -1,4 +1,4 @@
---Queries and Funtions to show the base business rules
+--Queries and Functions to show the base business rules
 -- 1.A salesperson may sell many cars, but each car is sold by only one salesperson.
 --Query to show how many cars each salesperson has sold
 SELECT salesperson.salesperson_id, salesperson.first_name, salesperson.last_name, count(invoice_id)
@@ -29,7 +29,7 @@ FROM sales_invoice
 WHERE customer_id = 3;
 
 -- 5.A customer may come in just to have his or her car serviced; that is, a customer need not buy a car to be classified as a customer.
---Query to show that customer has a car that has status as service only
+--Query to show that customer has a car that has status as service only(so price is null)
 SELECT *
 FROM car
 WHERE car_status = 'service only'; 

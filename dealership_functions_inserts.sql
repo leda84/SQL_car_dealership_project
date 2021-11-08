@@ -228,11 +228,46 @@ $$
 LANGUAGE plpgsql;
 
 
+--testing
+CREATE OR REPLACE FUNCTION add_service_ticket_test()
+RETURNS void
+AS $$
+BEGIN
+	UPDATE service_history SET part_cost = (SELECT part_cost FROM parts_inventory WHERE service_history.part_number = parts_inventory.part_number);
+END;
+$$
+LANGUAGE plpgsql;
+
+--more testing*********THIS WORKS************
+CREATE OR REPLACE FUNCTION add_ticket_test(_vin INTEGER, _part_number INTEGER, _labor_cost NUMERIC(8,2), _mechanic_id INTEGER, _service_date DATE DEFAULT CURRENT_DATE)
+RETURNS void
+AS $$
+BEGIN
+	INSERT INTO service_history(vin_number, part_number, labor_cost, mechanic_id, service_date)
+	VALUES(_vin, _part_number, _labor_cost, _mechanic_id, _service_date);
+	UPDATE service_history SET part_cost = (SELECT part_cost FROM parts_inventory WHERE service_history.part_number = parts_inventory.part_number);
+END;
+$$
+LANGUAGE plpgsql;
+
+
+SELECT add_ticket_test(3,2,40,3);
 
 -----------------------------ASK ABOUT------------------------------
 ----NEED TO FIND A WAY TO HAVE PART COST AUTOMATICALLY ADD WHEN PART NUMBER IS USED.
 	--Possibly just going to drop the part cost column from service history to keep it simple.
 		--Will make a query to show the service ticket(with price and all info using joins/subqueries)
+
+--this update adds the part cost to service_history tickets
+--run after adding a ticket
+UPDATE service_history
+  SET part_cost = (SELECT part_cost FROM parts_inventory WHERE service_history.part_number = parts_inventory.part_number);
+
+
+SELECT *
+FROM service_history;
+		
+		
 ----ALSO FIND WAY TO HAVE TOTAL COST FIGURED OUT
 	--will probably just make this a procedure that gives sum
 
@@ -240,6 +275,7 @@ LANGUAGE plpgsql;
 SELECT add_service_ticket(3,2,1,0);
 SELECT add_service_ticket(3,2,50,1);
 SELECT add_service_ticket(2,1,80,1);
+
 
 --Adding service ticket using updated function for inserting into updated table name
 SELECT add_service_ticket(1,2,60,2);
@@ -390,7 +426,7 @@ SELECT add_invoice(3,1,26222,2);
 --updating car status to show sold
 UPDATE car
 SET car_status = 'sold'
-WHERE vin_number = 3;
+WHERE vin_number = 1;
 --updating customer_id in car table since they're sold
 UPDATE car
 SET customer_id = 3
