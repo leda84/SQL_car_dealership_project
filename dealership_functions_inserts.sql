@@ -432,6 +432,22 @@ UPDATE car
 SET customer_id = 3
 WHERE vin_number = 1;
 
+CREATE OR REPLACE FUNCTION add_invoice_test(_customer_id INTEGER, _vin_number INTEGER, _car_price NUMERIC(8,2), _salesperson_id INTEGER, _invoice_date DATE DEFAULT CURRENT_DATE)
+RETURNS void
+AS $$
+BEGIN
+	INSERT INTO sales_invoice(customer_id, vin_number, car_price, salesperson_id, invoice_date)
+	VALUES(_customer_id, _vin_number, _car_price, _salesperson_id, _invoice_date);
+	UPDATE car SET customer_id = (SELECT customer_id FROM customer WHERE car.customer_id = customer.customer_id);
+	UPDATE car SET car_status = 'sold';
+END;
+$$
+LANGUAGE plpgsql;
+
+SELECT add_invoice_test(2,6,61935,1);
+--worked but did not change cust id
+--try taking cust id out of parameters
+
 --*******find a way to show difference from list price and price sold for the cars
 
 
